@@ -25,18 +25,11 @@ app.config['BOOK_PICS_FOLDER'] = os.path.join(base_upload_folder, 'books_pics')
 os.makedirs(app.config['PROFILE_PICS_FOLDER'], exist_ok=True)
 os.makedirs(app.config['BOOK_PICS_FOLDER'], exist_ok=True)
 
-# print("Upload Folders:")
-# print("Base Upload Folder:", app.config['UPLOAD_FOLDER'])
-# print("Profile Pictures Folder:", app.config['PROFILE_PICS_FOLDER'])
-# print("Book Pictures Folder:", app.config['BOOK_PICS_FOLDER'])
-
-# Diagnostic print to check the upload folder path
-
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # limit the maximum upload size to 16MB
-
+# Limit the maximum upload size to 16MB
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
 # Enable CORS for all routes and origins
-CORS(app, resources={r"/*": {"origins": "http://127.0.0.1:54346"}})
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 # Initialize extensions
 db = SQLAlchemy(app)  # Database ORM
@@ -44,6 +37,11 @@ bcrypt = Bcrypt(app)  # Password hashing
 
 # Set the local time zone (UTC+3)
 local_tz = pytz.timezone('Etc/GMT-3')
+
+# Serve static files from the uploads folder
+@app.route('/uploads/<path:filename>')
+def serve_uploads(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 
 # Function to get the current local time
